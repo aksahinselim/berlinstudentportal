@@ -1,0 +1,118 @@
+services:
+  # Database Service
+  postgres:
+    image: postgres:15-alpine
+    container_name: bsp-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-student_portal}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - bsp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend Service (Express API)
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bsp-backend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - DB_NAME=${DB_NAME:-student_portal}
+      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-student_portal}
+      - JWT_SECRET=${JWT_SECRET:-super_secret_jwt_key_change_in_prod}
+      # SMTP Configuration (use .env file for credentials)
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - SMTP_USER=${SMTP_USER:-your-email@example.com}
+      - SMTP_PASS=${SMTP_PASS:-your-app-password}
+      - MAIL_FROM=${MAIL_FROM:-Your App <your-email@example.com>}
+      # OTP Configuration
+      - OTP_TTL_MINUTES=10
+      - OTP_MAX_ATTEMPTS=5
+      - OTP_RESEND_COOLDOWN_SECONDS=60
+      - FRONTEND_URL=http://localhost:3000
+      # S3/MinIO Configuration (for file attachments storage)
+      # Temporarily disabled - using local storage instead
+      # - S3_ENDPOINT=http://minio:9000
+      # - S3_BROWSER_ENDPOINT=http://localhost:9000
+      # - S3_ACCESS_KEY=${MINIO_ROOT_USER:-minioadmin}
+      # - S3_SECRET_KEY=${MINIO_ROOT_PASSWORD:-minioadmin123}
+      # - S3_BUCKET=${S3_BUCKET:-uploads}
+      # - S3_REGION=${S3_REGION:-us-east-1}
+      # - S3_USE_SSL=false
+    depends_on:
+      postgres:
+        condition: service_healthy
+      # minio:
+      #   condition: service_healthy
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/uploads:/app/uploads
+    networks:
+      - bsp-network
+
+  # Frontend Service (Vue SPA)
+  frontend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=/api
+    container_name: bsp-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - bsp-network
+
+  # MinIO S3-Compatible Object Storage
+  minio:
+    image: minio/minio:latest
+    container_name: bsp-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # Web Console
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-minioadmin}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minioadmin123}
+    volumes:
+      - minio_data:/data
+    networks:
+      - bsp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+volumes:
+  postgres_data:
+  minio_data:
+
+networks:
+  bsp-network:
+    driver: bridge

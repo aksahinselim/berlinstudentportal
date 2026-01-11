@@ -1,0 +1,20 @@
+node_modules
+dist
+.git
+.gitignore
+.env
+.DS_Store
+coverage
+npm-debug.log
+*.md
+.vscode
+.idea
+uploads/*
+!uploads/.gitkeep
+
+# Exclude environment variants and private credentials
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx

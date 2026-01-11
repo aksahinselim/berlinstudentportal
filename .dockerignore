@@ -1,0 +1,18 @@
+node_modules
+dist
+.git
+.gitignore
+.env
+.DS_Store
+coverage
+npm-debug.log
+Dockerfile
+docker-compose.yml
+README.md
+
+# Exclude environment variants and private credentials
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx

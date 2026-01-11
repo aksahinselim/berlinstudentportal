@@ -1,0 +1,146 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies
+node_modules
+backend/node_modules
+
+# Build outputs
+dist
+dist-ssr
+backend/dist
+*.local
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+backend/.env
+
+# Uploads (all user files)
+backend/uploads/*
+!backend/uploads/.gitkeep
+uploads/*
+
+# Development notes (keep only README and LICENSE)
+*_SUMMARY.md
+*_FIX.md
+*_GUIDE.md
+*_COMPLETE.md
+*_IMPLEMENTATION.md
+QUICKSTART*.md
+SETUP.md
+START_HERE.md
+TEST_*.md
+DEBUG_*.md
+DEPLOYMENT.md
+DOCKER_SETUP.md
+PROJECT_*.md
+CHANGES_*.md
+RATE_LIMIT_*.md
+REGISTRATION_*.md
+OTP_*.md
+CAMERA_*.md
+EMAIL_*.md
+FINAL_*.md
+!LICENSE
+!LICENSE.md
+
+# Mock data
+src/data/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Docker volumes
+postgres_data/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Coverage
+coverage
+*.lcov
+.nyc_output
+
+# Testing
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# Temporary files
+*.tmp
+*.temp
+.cache
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# Windows
+*.stackdump
+[Dd]esktop.ini
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Prisma
+prisma/migrations/migration_lock.toml
+
+# IDE - VSCode
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
+.history/*
+
+# IDE - WebStorm
+.idea/
+*.iml
+*.iws
+.idea_modules/
+
+# Misc
+*.swp
+*.swo
+*~.nib
+*.bak
+
+# Keep all environment variants and private credentials out of version control
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.dump
